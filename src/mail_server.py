@@ -23,7 +23,7 @@ class MailServer():
     def autorize(self):
         self.imap = imaplib.IMAP4_SSL(self._choose_server())
         self.imap.login(self.name, self.mail_password)
-        self._search_mail_id()
+        self._search_mail_uid()
 
         '''Поиск и сбор писем в почте'''
     def _take_folders(self):
@@ -40,14 +40,19 @@ class MailServer():
         
         return self.folders_list
 
-    def _search_mail_id(self):
+    def _search_mail_uid(self):
         taken_folders = self._take_folders()
+        mail_uid = []
+        
         for folder in taken_folders:
             sum_mail = self.imap.select(folder)
             if sum_mail[1] == [b'0']:
                 print(f'В папке {folder} нет писем')
                 continue
-            print(self.imap.search(None, 'ALL'))
+            numbers = str(self.imap.uid('search', "ALL")[1][0]).split('\'')[1].split(' ')
+            [mail_uid.append(number) for number in numbers]
+
+        return mail_uid
         
 
 
