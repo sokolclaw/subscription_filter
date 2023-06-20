@@ -8,7 +8,6 @@ logging.basicConfig(filename=config.filename, level=logging.INFO)
 class MailServer():
     
     def __init__(self):
-
         self.servers = config
         self.name = input('Логин: ')
         self.mail_password = input('Пароль: ')
@@ -24,7 +23,33 @@ class MailServer():
     def autorize(self):
         self.imap = imaplib.IMAP4_SSL(self._choose_server())
         self.imap.login(self.name, self.mail_password)
-        print(self.imap.select('INBOX'))
+        self._search_mail_id()
+
+        '''Поиск и сбор писем в почте'''
+    def _take_folders(self):
+        self.mail_folders = self.imap.list()
+        self.folders_list = []
+
+        if self.mail_folders[0] != 'OK':
+            logging.exception('imap.list != \'OK\', не удалось выгрузить папки')
+            raise Exception('Нет доступа к папкам')
+        
+        for folder in self.mail_folders[1]:
+            self.cut_folder = str(folder).split('" ')
+            self.folders_list.append(self.cut_folder[1][:-1])
+        
+        return self.folders_list
+
+    def _search_mail_id(self):
+        taken_folders = self._take_folders()
+        for folder in taken_folders:
+            sum_mail = self.imap.select(folder)
+            if sum_mail[1] == [b'0']:
+                print(f'В папке {folder} нет писем')
+                continue
+            print(self.imap.search(None, 'ALL'))
+        
+
 
 if __name__ == '__main__':
     ms = MailServer()
