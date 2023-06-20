@@ -21,52 +21,21 @@ class MailServer():
             print('Ошибка. Повторите ввод почтового сервиса')
 
     def autorize(self):
-        self.imap = imaplib.IMAP4_SSL(self._choose_server())
-        self.imap.login(self.name, self.mail_password)
-        self._search_mail_uid()
+        try:
+            self.imap = imaplib.IMAP4_SSL(self._choose_server())
+            self.imap.login(self.name, self.mail_password)
+            return self.imap
+        except ValueError:
+            logging.exception('Неверный логин или пароль')
+            print('Неверный логин или пароль')
+        except NameError:
+            logging.exception('Неправильное имя сервера')
+            print('Неправильный ввод названия почтового сервиса')
+        except (imaplib.IMAP4.error, ConnectionRefusedError, TypeError):
+            logging.exception('Нет доступа к почте')
+            print('''Нет доступа к почте. Убедитесь, что даны разрешения на подключение
+            сервиса к почтовому ящику,а также проверьте корректность логина и пароля''')
 
-        '''Поиск и сбор писем в почте'''
-    def _take_folders(self):
-        self.mail_folders = self.imap.list()
-        self.folders_list = []
+ms = MailServer()
 
-        if self.mail_folders[0] != 'OK':
-            logging.exception('imap.list != \'OK\', не удалось выгрузить папки')
-            raise Exception('Нет доступа к папкам')
-        
-        for folder in self.mail_folders[1]:
-            self.cut_folder = str(folder).split('" ')
-            self.folders_list.append(self.cut_folder[1][:-1])
-        
-        return self.folders_list
-
-    def _search_mail_uid(self):
-        taken_folders = self._take_folders()
-        mail_uid = []
-        
-        for folder in taken_folders:
-            sum_mail = self.imap.select(folder)
-            if sum_mail[1] == [b'0']:
-                print(f'В папке {folder} нет писем')
-                continue
-            numbers = str(self.imap.uid('search', "ALL")[1][0]).split('\'')[1].split(' ')
-            [mail_uid.append(number) for number in numbers]
-
-        return mail_uid
-        
-
-
-if __name__ == '__main__':
-    ms = MailServer()
-    try:
-        ms.autorize()
-    except ValueError:
-        logging.exception('Неверный логин или пароль')
-        print('Неверный логин или пароль')
-    except NameError:
-        logging.exception('Неправильное имя сервера')
-        print('Неправильный ввод названия почтового сервиса')
-    except (imaplib.IMAP4.error, ConnectionRefusedError, TypeError):
-        logging.exception('Нет доступа к почте')
-        print('''Нет доступа к почте. Убедитесь, что даны разрешения на подключение
-        сервиса к почтовому ящику,а также проверьте корректность логина и пароля''')
+   
