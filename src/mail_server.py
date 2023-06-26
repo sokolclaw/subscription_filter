@@ -11,18 +11,13 @@ class MailServer():
         self.servers = config
         self.name = input('Логин: ')
         self.mail_password = input('Пароль: ')
+        self.mail = input('Какая почта?  ')
+        self.save_account = input('Сохранить данные аккаунта? yes/no ')
 
-    def _choose_server(self):
-        try:
-            self.mail = input('Какая почта?  ')
-            return self.servers.mail_servers[self.mail]
-        except (KeyError):
-            logging.exception('Неправильный ввод почтового сервиса')
-            print('Ошибка. Повторите ввод почтового сервиса')
 
     def autorize(self):
         try:
-            self.imap = imaplib.IMAP4_SSL(self._choose_server())
+            self.imap = self._choose_server()
             self.imap.login(self.name, self.mail_password)
             return self.imap
         except ValueError:
@@ -35,6 +30,14 @@ class MailServer():
             logging.exception('Нет доступа к почте')
             print('''Нет доступа к почте. Убедитесь, что даны разрешения на подключение
             сервиса к почтовому ящику,а также проверьте корректность логина и пароля''')
+
+    def _choose_server(self):
+        try:
+            mail = self.servers.mail_servers[self.mail]
+            return imaplib.IMAP4_SSL(mail)
+        except (KeyError):
+            logging.exception('Неправильный ввод почтового сервиса')
+            print('Ошибка. Повторите ввод почтового сервиса')
 
 ms = MailServer()
 

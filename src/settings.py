@@ -14,4 +14,5 @@ class Settings():
 
         self.filename = 'mail.log'
 
+
 config = Settings()
