@@ -8,11 +8,11 @@ logging.basicConfig(filename=config.filename, level=logging.INFO)
 
 class MailServer():
     
-    def __init__(self):
+    def __init__(self, mail, saving, name, password, save_account):
         self.servers = config
-        self.mail = input('Какая почта?  ')
-        self.saving = input('Сохраненные данные? yes/no ')
-        self.name = input('Логин: ')
+        self.mail = mail
+        self.saving = saving
+        self.name = name
         if self.saving == 'yes':
             account = UserMailCredentials()  
             account.choose_email(self.mail)
@@ -22,8 +22,8 @@ class MailServer():
                 logging.exception('нет сохраненных аккаунтов в базе')
                 print('нет сохраненных аккаунтов в базе')
         else:
-            self.mail_password = input('Пароль: ')
-            self.save_account = input('Сохранить данные аккаунта? yes/no ')
+            self.mail_password = password
+            self.save_account = save_account
             if self.save_account == 'yes':
                 account = UserMailCredentials()
                 account.add_account(name=self.name, 
@@ -56,7 +56,3 @@ class MailServer():
             logging.exception('Неправильный ввод почтового сервиса')
             print('Ошибка. Повторите ввод почтового сервиса')
 
-
-ms = MailServer()
-
-   

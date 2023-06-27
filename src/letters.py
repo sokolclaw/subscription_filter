@@ -1,12 +1,11 @@
 import email
 
 import logging
-from mail_server import ms
 
 class Letters:
 
-    def __init__(self):
-        self.imap = ms.autorize()
+    def __init__(self, server):
+        self.imap = server
 
     def get_letters(self):
         try:
@@ -51,8 +50,3 @@ class Letters:
         self.letter_from = msg['Return-path']
         self.unsubscribe = msg['List-Unsubscribe']
         return self.unsubscribe
-
-    
-if __name__ == '__main__':
-    letter = Letters()
-    letter.get_letters()
