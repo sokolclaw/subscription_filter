@@ -2,6 +2,7 @@ import imaplib
 import logging
 
 from settings import config
+from models import UserMailCredentials
 
 logging.basicConfig(filename=config.filename, level=logging.INFO)
 
@@ -13,7 +14,11 @@ class MailServer():
         self.mail_password = input('Пароль: ')
         self.mail = input('Какая почта?  ')
         self.save_account = input('Сохранить данные аккаунта? yes/no ')
-
+        if self.save_account == 'yes':
+            account = UserMailCredentials()
+            account.add_account(name=self.name, 
+                pas=self.mail_password, 
+                mail=self.mail)
 
     def autorize(self):
         try:
@@ -38,6 +43,7 @@ class MailServer():
         except (KeyError):
             logging.exception('Неправильный ввод почтового сервиса')
             print('Ошибка. Повторите ввод почтового сервиса')
+
 
 ms = MailServer()
 

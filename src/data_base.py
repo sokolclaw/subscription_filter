@@ -1,40 +1,9 @@
-import sqlite3 as sql
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
 
-from settings import config
+engine = create_engine('sqlite:///mail_base.db', echo=True)
+db_session = scoped_session(sessionmaker(bind=engine))
 
-class DataBase:
-    def __init__(self):
-        self.con = sql.connect('mail_base.db')
-        self.cur = self.con.cursor()
-        self.bases = config
-
-    def create_table(self):
-        
-        self.cur.execute(''' 
-            CREATE TABLE IF NOT EXISTS UserMailCredentials (
-                id INTEGER PRIMARY KEY,
-                username TEXT,
-                password TEXT,
-                mail_server TEXT
-            ); ''')
-        self.con.commit()
-
-        self.cur.execute('''
-            CREATE TABLE IF NOT EXISTS MailUnsubExceptions (
-                id INTEGER PRIMARY KEY,
-                account_id INTEGER,
-                mail_from TEXT,
-            );''')
-        self.con.commit()
-
-        self.cur.execute('''
-            CREATE TABLE IF NOT EXISTS OperationHistory (
-                id INTEGER PRIMARY KEY,
-                account_id INTEGER,
-                uid INTEGER
-            ); ''')
-            
-        self.con.commit()
-
-
-db = DataBase()
+Base = declarative_base()
+Base.query = db_session.query_property()

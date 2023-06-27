@@ -50,7 +50,7 @@ class Letters:
         msg = email.message_from_bytes(msg[0][1])
         self.letter_from = msg['Return-path']
         self.unsubscribe = msg['List-Unsubscribe']
-        return self.letter_from
+        return self.unsubscribe
 
     
 if __name__ == '__main__':
