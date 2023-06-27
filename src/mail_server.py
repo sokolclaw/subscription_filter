@@ -10,15 +10,25 @@ class MailServer():
     
     def __init__(self):
         self.servers = config
-        self.name = input('Логин: ')
-        self.mail_password = input('Пароль: ')
         self.mail = input('Какая почта?  ')
-        self.save_account = input('Сохранить данные аккаунта? yes/no ')
-        if self.save_account == 'yes':
-            account = UserMailCredentials()
-            account.add_account(name=self.name, 
-                pas=self.mail_password, 
-                mail=self.mail)
+        self.saving = input('Сохраненные данные? yes/no ')
+        self.name = input('Логин: ')
+        if self.saving == 'yes':
+            account = UserMailCredentials()  
+            account.choose_email(self.mail)
+            try:
+                self.mail_password = account.take_password(self.name)
+            except AttributeError:
+                logging.exception('нет сохраненных аккаунтов в базе')
+                print('нет сохраненных аккаунтов в базе')
+        else:
+            self.mail_password = input('Пароль: ')
+            self.save_account = input('Сохранить данные аккаунта? yes/no ')
+            if self.save_account == 'yes':
+                account = UserMailCredentials()
+                account.add_account(name=self.name, 
+                    pas=self.mail_password, 
+                    mail=self.mail)
 
     def autorize(self):
         try:
@@ -35,6 +45,8 @@ class MailServer():
             logging.exception('Нет доступа к почте')
             print('''Нет доступа к почте. Убедитесь, что даны разрешения на подключение
             сервиса к почтовому ящику,а также проверьте корректность логина и пароля''')
+        except AttributeError:
+            logging.exception('нет сохраненных аккаунтов в базе')
 
     def _choose_server(self):
         try:

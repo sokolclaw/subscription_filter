@@ -13,6 +13,15 @@ class UserMailCredentials(Base):
         db_session.add(self.account)
         db_session.commit()
 
+    def choose_email(self, mail):
+        self.emails = UserMailCredentials.query.filter(UserMailCredentials.mail_server==mail)
+        print([email.username for email in self.emails])
+
+    def take_password(self, name):
+            self.pwd = UserMailCredentials.query.filter(UserMailCredentials.username==name).first()
+            return self.pwd.password
+
+
 class MailUnsubExceptions(Base):
     __tablename__ = 'MailUnsubExceptions'
     id = Column(Integer, primary_key=True)
